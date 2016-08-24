@@ -56,14 +56,21 @@ def api_deputadosSave():
                                       child.find('condicao').text))
         save(deputados)
     return "Found"
+columns = ('id', 'nome', 'matricula', 'partido', 'condicao','urlFoto');
 
 
 @app.route('/deputados/get', methods=['GET'])
 def api_deputadosGet():
+    results = [];
     conn = open_connect()
     c = conn.cursor()
-    c.execute("SELECT id, nome,  partido, urlFoto, condicao FROM deputados")
-    return str(len(json.dumps(c.fetchall())))
+    c.execute("SELECT id, nome, matricula, partido, condicao, urlFoto FROM deputados")
+    for row in c.fetchall():
+        results.append(dict(zip(columns, row)))
+    retorno = json.dumps(results)
+    c.close()
+    conn.close()
+    return retorno
     # table = "<center><table border=1><tr><th>id</th><th>Nome</th><th>Partido</th><th>Foto</th><th>Condicao</th></tr>"
     # for row in c.fetchall():
     #     table = table + '<tr><td>' + str(row[0]) + '</td><td>'
@@ -106,5 +113,5 @@ def api_deputadosGet():
 
 
 if __name__ == '__main__':
-    app.run(host='localhost', port=5002)
+    app.run(port=5003)
     # connect()
