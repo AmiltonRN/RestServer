@@ -4,19 +4,22 @@ import re
 import json
 from string import upper
 
-from flask import Flask
+from flask import Flask, request
 
 app = Flask(__name__)
 
 columns = ('posicao','proximidade','nome')
 
 
-@app.route('/pharmer/find/<pharmacophore>', methods=['GET'])
-def runFile(pharmacophore):
-    f = open('tmpFile.query', 'w')  # grava o arquivo de entrada no diretorio
-    f.write(pharmacophore)
-    f.close()
-    os.system('./pharmer.ubuntu.12.04 dbsearch -dbdir /home/amilton/ATUAL -in tmpFile.query -out saida.txt')
+@app.route('/pharmer/find', methods=['GET', 'POST'])
+def runFile():
+    # if request.method == 'POST':
+    if (request.headers['Content-type'] == 'application/octet-stream') or (request.headers['Content-type'] == 'text/plain'):
+        print (request.data)
+        f = open('tmpFile.query', 'w')  # grava o arquivo de entrada no diretorio
+        f.write(request.data)
+        f.close()
+        os.system('./pharmer.ubuntu.12.04 dbsearch -dbdir /home/amilton/ATUAL -in tmpFile.query -out saida.txt')
 
     result = []
     for linha in open('saida.txt', 'r').readlines():
