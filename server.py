@@ -1,4 +1,4 @@
-import json, requests, xml.etree.ElementTree as etree
+import requests, xml.etree.ElementTree as etree
 import mysql.connector as mysql
 import json
 from flask import Flask
@@ -11,13 +11,14 @@ db = SQL(app)
 response = requests.get("http://www.camara.leg.br/SitCamaraWS/Deputados.asmx/ObterDeputados")
 columns = ('id', 'nome', 'matricula', 'partido', 'condicao', 'urlFoto')
 
-class Deputado(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    nome = db.Column(db.String(80))
-    matricula = db.Column(db.String(80))
-    partido = db.Column(db.String(80))
-    urlFoto = db.Column(db.String(160))
-    condicao = db.Column(db.String(80))
+
+class Deputado (db.Model):
+    id = db.Column('id', db.Integer, primary_key=True)
+    nome = db.Column('nome', db.String(80))
+    matricula = db.Column('matricula',db.String(80))
+    partido = db.Column('partido', db.String(80))
+    urlFoto = db.Column('urlFoto', db.String(160))
+    condicao = db.Column('condicao', db.String(80))
 
     def __init__(self, nome, matricula, partido, urlFoto, condicao):
         self.nome = nome
@@ -26,8 +27,9 @@ class Deputado(db.Model):
         self.urlFoto = urlFoto
         self.condicao = condicao
 
-    def __toJson__(self):
-        return dict(zip(columns, (self.id, self.nome, self.matricula, self.partido, self.urlFoto, self.condicao)))
+    # def __toJson__(self):
+    #     # print (Deputado.id.name)
+    #     return dict(zip(columns, (self.id, self.nome, self.matricula, self.partido, self.urlFoto, self.condicao)))
 
 
 @app.route('/')
@@ -57,7 +59,9 @@ def api_deputadosGet():
     results = []
     for row in db.session.query(Deputado).all():
         results.append(row.__toJson__())
+    # return demjson.encode(Deputado, db.session.query(Deputado).all())
     return json.dumps(results)
+
 
 if __name__ == '__main__':
     app.run(port=5003, debug=True, threaded=True, host='0.0.0.0')
